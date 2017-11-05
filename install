@@ -1,0 +1,113 @@
+#!/bin/bash
+
+if [[ ($# -ne 1) && ($# -ne 2) ]]
+then
+    echo "Usage: $0 [--live] <directory>"
+    exit 1
+fi
+
+for arg in "$@"
+do
+    case "$arg" in
+        --live)
+            DEST_ROOT='/real/root/here'
+            ;;
+        *)
+            EXTRACT_DIR="$arg"
+            ;;
+    esac
+done
+DEST_ROOT=${DEST_ROOT:-'/var/tmp/test-install-root'}
+
+PACKAGE_NAME='__PACKAGE_NAME__'
+PACKAGE_FILE='__PAYLOAD__'
+
+function AssertDir() {
+    if [[ $# -eq 1 ]]
+    then
+        local DIRPATH=$1
+        if [[ ! -d $DIRPATH ]]
+        then
+            mkdir -p $DIRPATH
+            if [[ $? -ne 0 ]]
+            then
+                echo "Error: $DIRPATH - no such directory, and cannot create."
+                exit 1
+            fi
+        fi
+    else
+        echo "AssertDir usage error: Must assert exactly one directory name."
+        echo "Called as: AssertDir $@"
+        exit 1
+    fi
+}
+
+AssertDir $EXTRACT_DIR
+cd $EXTRACT_DIR
+
+if [[ -f $PACKAGE_FILE ]]
+then
+    gzip -dc $PACKAGE_FILE | tar xf -
+    if [[ $? -ne 0 ]]
+    then
+        echo "Error: Package extraction of $PACKAGE_FILE failed."
+        exit 1
+    fi
+
+    if [[ -d $PACKAGE_NAME ]]
+    then
+        cd $PACKAGE_NAME
+
+        AssertDir $DEST_ROOT
+
+        for dir in bin etc lib sbin
+        do
+            if [[ -d ${dir} ]]
+            then
+                rsync -rltpv ${dir}/ ${DEST_ROOT}/${dir}/
+            else
+                echo "Warning: ${dir}: No such directory in package."
+            fi
+        done
+
+        # Making all this contingene on there not already being a
+        # data directory.  For now, we won't overwrite any changes
+        # that have been made to the ownership or permissions after
+        # installation.
+        DATA_DIR="${DEST_ROOT}/data"
+        if [[ ! -d $DATA_DIR ]]
+        then
+            AssertDir $DATA_DIR
+            chgrp opsgroup $DATA_DIR
+            chmod g+s $DATA_DIR
+        fi
+
+        # Same notes apply to the log dir as to the data dir.
+        LOG_DIR="${DEST_ROOT}/log"
+        if [[ ! -d $LOG_DIR ]]
+        then
+            AssertDir $LOG_DIR
+            chmod 750 $LOG_DIR
+        fi
+
+        if [[ -d 'vendor' ]]
+        then
+            cd vendor
+            if [[ -f Makefile ]]
+            then
+                perl -pi -e 'BEGIN{$d=shift}s|__DESTROOT__|$d|g' $DEST_ROOT Makefile
+                gmake
+            else
+                echo "Warning: No Makefile in 'vendor' directory."
+            fi
+        else
+            echo "Warning: No 'vendor' directory found in package."
+        fi
+    else
+        echo "Error: No $PACKAGE_NAME directory under $EXTRACT_DIR found."
+        exit 1
+    fi
+else
+    echo "Error: $PACKAGE_FILE not found in $EXTRACT_DIR.  Exiting."
+    exit 1
+fi

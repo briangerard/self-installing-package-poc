@@ -1,0 +1,11 @@
+END_OF_INSTALLER
+
+if [[ $? -ne 0 ]]
+then
+    echo "Error: Unable to create ${INSTALLER_NAME} inside ${INSTALLER_DIR}.  Exiting."
+    exit 1
+fi
+
+chmod 755 $INSTALLER_NAME
+
+cat <<"END_OF_PACKAGE" | base64 -d > $PACKAGE_FILE

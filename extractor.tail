@@ -1,0 +1,9 @@
+END_OF_PACKAGE
+
+./${INSTALLER_NAME} "$@" $INSTALLER_DIR
+
+if [[ $? -eq 0 ]]
+then
+    cd $INSTALLER_ROOT
+    /bin/rm -rf $INSTALLER_DIR
+fi

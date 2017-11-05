@@ -1,0 +1,23 @@
+#!/bin/bash
+
+PACKAGE_NAME='__PACKAGE_NAME__'
+PACKAGE_FILE='__PAYLOAD__'
+
+INSTALLER_ROOT='/var/tmp'
+INSTALLER_DIR="${INSTALLER_ROOT}/${PACKAGE_NAME}-install"
+
+INSTALLER_NAME='pkginstall'
+
+if [[ ! -d $INSTALLER_DIR ]]
+then
+    mkdir -p $INSTALLER_DIR
+    if [[ $? -ne 0 ]]
+    then
+        echo "Error: $INSTALLER_DIR does not exist, and cannot create.  Exiting."
+        exit 1
+    fi
+fi
+
+cd $INSTALLER_DIR
+
+cat <<"END_OF_INSTALLER" | base64 -d > $INSTALLER_NAME
