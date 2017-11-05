@@ -70,8 +70,10 @@ then
             if [[ -d ${dir} ]]
             then
                 # Updates any files that need it, and leaves extra files
-                # alone.  This allows multiple packages to have the same
-                # root safely, for example.
+                # alone.  This allows multiple packages to safely install
+                # into the same root, for example.  So long as two packages
+                # don't both think they own the same file, they can
+                # peacefully coexist.
                 rsync -rltpv ${dir}/ ${DEST_ROOT}/${dir}/
             else
                 echo "Warning: ${dir}: No such directory in package."

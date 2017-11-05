@@ -1,0 +1,44 @@
+function PausePrint() {
+    local PAUSE=0.13
+    local CHARS=$(echo "$@" | sed -e 's/./& /g;s/   / SPACE /g')
+
+    echo -n "                          "
+    for CHAR in $CHARS
+    do
+        if [[ $CHAR = 'SPACE' ]]
+        then
+            CHAR=" "
+        fi
+        echo -n "$CHAR"
+        sleep $PAUSE
+    done
+    echo ""
+}
+
+function PageDown() {
+    for (( i=0; i<=20; i++ ))
+    do
+        echo ""
+    done
+}
+
+function Demonstrate() {
+    clear
+    PageDown
+    PausePrint "This is my demo."
+    PageDown
+    sleep 1
+
+    clear
+    PageDown
+    PausePrint "There are many like it."
+    PageDown
+    sleep 1
+
+    clear
+    PageDown
+    PausePrint "But this one is mine."
+    PageDown
+    sleep 1
+    clear
+}

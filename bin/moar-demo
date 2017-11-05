@@ -1,3 +1,8 @@
 #!/bin/bash
 
-echo "D-d-d-demo"
+INSTALL_ROOT=$(readlink -m "$(dirname $(readlink -m $0))/..")
+LIB_DIR="${INSTALL_ROOT}/lib"
+
+. "${LIB_DIR}/second_lib"
+
+Demonstrate
