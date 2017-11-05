@@ -1,7 +1,17 @@
 END_OF_PACKAGE
 
+if [[ $? -ne 0 ]]
+then
+    echo "Error: Unable to create ${PACKAGE_FILE} inside ${INSTALLER_DIR}.  Exiting."
+    exit 1
+fi
+
+# Assuming all that went alright, make the installer executable and try
+# to run it (passing through any arguments that this script received).
+chmod 755 $INSTALLER_NAME
 ./${INSTALLER_NAME} "$@" $INSTALLER_DIR
 
+# And if that went well, clean up after ourselves.
 if [[ $? -eq 0 ]]
 then
     cd $INSTALLER_ROOT

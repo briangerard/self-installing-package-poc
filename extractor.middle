@@ -6,6 +6,6 @@ then
     exit 1
 fi
 
-chmod 755 $INSTALLER_NAME
-
+# Take the base64-encoded contents of the package to be installed, decode it,
+# and create the package.
 cat <<"END_OF_PACKAGE" | base64 -d > $PACKAGE_FILE

@@ -10,18 +10,20 @@ for arg in "$@"
 do
     case "$arg" in
         --live)
-            DEST_ROOT='/real/root/here'
+            DEST_ROOT='/usr/local/our_stuff'
             ;;
         *)
             EXTRACT_DIR="$arg"
             ;;
     esac
 done
-DEST_ROOT=${DEST_ROOT:-'/var/tmp/test-install-root'}
+DEST_ROOT=${DEST_ROOT:-'/var/tmp/test-our_stuff'}
 
 PACKAGE_NAME='__PACKAGE_NAME__'
 PACKAGE_FILE='__PAYLOAD__'
 
+# This is "assert" in the C sense of the word.  Exit if the directory
+# doesn't exist and cannot be created.
 function AssertDir() {
     if [[ $# -eq 1 ]]
     then
@@ -42,11 +44,14 @@ function AssertDir() {
     fi
 }
 
+# Make sure there's a place to expand the tarball.
 AssertDir $EXTRACT_DIR
 cd $EXTRACT_DIR
 
 if [[ -f $PACKAGE_FILE ]]
 then
+    # Using 'gzip -dc' vs 'tar zxf' because there are some hosts where
+    # tar is too old to understand the 'z'.
     gzip -dc $PACKAGE_FILE | tar xf -
     if [[ $? -ne 0 ]]
     then
@@ -64,25 +69,19 @@ then
         do
             if [[ -d ${dir} ]]
             then
+                # Updates any files that need it, and leaves extra files
+                # alone.  This allows multiple packages to have the same
+                # root safely, for example.
                 rsync -rltpv ${dir}/ ${DEST_ROOT}/${dir}/
             else
                 echo "Warning: ${dir}: No such directory in package."
             fi
         done
 
-        # Making all this contingene on there not already being a
-        # data directory.  For now, we won't overwrite any changes
+        # Making all this contingent on there not already being a
+        # log directory.  For now, we won't overwrite any changes
         # that have been made to the ownership or permissions after
         # installation.
-        DATA_DIR="${DEST_ROOT}/data"
-        if [[ ! -d $DATA_DIR ]]
-        then
-            AssertDir $DATA_DIR
-            chgrp opsgroup $DATA_DIR
-            chmod g+s $DATA_DIR
-        fi
-
-        # Same notes apply to the log dir as to the data dir.
         LOG_DIR="${DEST_ROOT}/log"
         if [[ ! -d $LOG_DIR ]]
         then
@@ -95,6 +94,8 @@ then
             cd vendor
             if [[ -f Makefile ]]
             then
+                # Repoint the vendor Makefile to whichever installation root
+                # we're using this run.
                 perl -pi -e 'BEGIN{$d=shift}s|__DESTROOT__|$d|g' $DEST_ROOT Makefile
                 gmake
             else

@@ -1,8 +1,12 @@
 #!/bin/bash
 
+# These values will be filled in on-the-fly by gmake
+# at build time.
 PACKAGE_NAME='__PACKAGE_NAME__'
 PACKAGE_FILE='__PAYLOAD__'
 
+# Where the installation should be run from.  Has no
+# effect on where the package is installed.
 INSTALLER_ROOT='/var/tmp'
 INSTALLER_DIR="${INSTALLER_ROOT}/${PACKAGE_NAME}-install"
 
@@ -20,4 +24,6 @@ fi
 
 cd $INSTALLER_DIR
 
+# Take the base64-encoded contents of the installation script, decode it,
+# and create the installer.
 cat <<"END_OF_INSTALLER" | base64 -d > $INSTALLER_NAME

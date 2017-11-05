@@ -33,11 +33,25 @@
 ##############
 
 PKGDIR           = pkg
+
+# This should be the one place the package name is defined, throughout the
+# package.  Literally everything else should depend on this for the package
+# name.
 PACKAGE_NAME     = our_awesome_utilities
 PACKAGE_VERSION := $(shell /bin/awk '/^Version/ {print $$2; exit}' ChangeLog)
-PAYLOAD          = $(PACKAGE_NAME)-$(PACKAGE_VERSION).package.tar.gz
+
+# This is the name of the tarball that contains the actual code being
+# installed.  I.e. - it should not contain any installation logic beyond
+# what's entailed in a tarball anyway (paths and such, that is).
+NOZIP_PAYLOAD    = $(PACKAGE_NAME)-$(PACKAGE_VERSION).package.tar
+PAYLOAD          = $(NOZIP_PAYLOAD).gz
+
+# The payload's location in the packaging directory, used in creating the
+# installer.  This will be removed after the self-installer is built.
+NOZIP_PKGPAYLOAD = $(PKGDIR)/$(NOZIP_PAYLOAD)
 PKGPAYLOAD       = $(PKGDIR)/$(PAYLOAD)
 
+# Temporary scratch space used on the way to building the payload.
 BUILDROOT = /tmp
 BUILDDIR  = $(BUILDROOT)/build-$(PACKAGE_NAME)
 BUILDSRC  = $(BUILDDIR)/$(PACKAGE_NAME)
@@ -57,17 +71,31 @@ define MANIFEST_TEXT
 endef
 export MANIFEST_TEXT
 
+# The contents of the payload.
 SRCDIRS         = bin lib sbin vendor
 ALL_FILES       = $(shell find $(SRCDIRS) -type f)
+
+# The pieces needed when creating the self-installer.
 EXTRACTOR_PARTS = extractor.head extractor.middle extractor.tail
 EXTRACTOR       = install-$(PACKAGE_NAME)
+
+# The final name of the self-installer (in the package directory).
+# This is the object which gmake creates.
 PKGEXTRACTOR    = $(PKGDIR)/$(EXTRACTOR)-$(PACKAGE_VERSION)
+
+# The script which will be extracted and used to install the payload.
 INSTALLER       = install
+
+# The installation script as it will be staged while creating the
+# self-installer.  This will be removed after the self-installer is
+# built.
 PKGINSTALLER    = $(PKGDIR)/$(INSTALLER)
 
+
+# Everything kicks off starting here.
 all: $(PKGEXTRACTOR) cleanup
 
-# This is the self-extracting script, described above.
+# The self-extracting script, described above.
 $(PKGEXTRACTOR): $(PKGDIR) $(EXTRACTOR_PARTS) $(PKGINSTALLER) $(PKGPAYLOAD)
 	cat extractor.head            > $(PKGEXTRACTOR)
 	perl -pi -e 's|__PACKAGE_NAME__|$(PACKAGE_NAME)|g' $(PKGEXTRACTOR)
@@ -89,7 +117,8 @@ $(PKGINSTALLER): $(INSTALLER)
 # which the installation script will untar and install from.
 $(PKGPAYLOAD): $(BUILDSRC) $(MANIFEST) $(ALL_FILES)
 	cp -R $(SRCDIRS) $(BUILDSRC)
-	tar czvf $(PKGPAYLOAD) -C $(BUILDDIR) $(PACKAGE_NAME)
+	tar cvf $(NOZIP_PKGPAYLOAD) -C $(BUILDDIR) $(PACKAGE_NAME)
+	gzip -9 $(NOZIP_PKGPAYLOAD)
 
 $(MANIFEST): $(BUILDETC)
 	@echo "$$MANIFEST_TEXT" > $(MANIFEST)

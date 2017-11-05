@@ -1,7 +1,7 @@
 # The value for __DESTROOT__ should be filled in prior to running
 # gmake.  Typically, this will be done by the installation script.
-# It will be set to the installation root /blah for a
-# "live" install, or likely /blah for a test
+# It will likely be set to the installation root /usr/local/our_stuff
+# for a "live" install, or likely /var/tmp/test-our_stuff for a test
 # installation.  This allows us to test the installation without
 # destroying the live instance.
 VENDOR_DIR = ___DESTROOT__/vendor
