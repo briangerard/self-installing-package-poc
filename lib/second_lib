@@ -16,7 +16,9 @@ function PausePrint() {
 }
 
 function PageDown() {
-    for (( i=0; i<=20; i++ ))
+    local LINES=$(stty size | awk '{print $1}')
+    LINES=$((((LINES-(LINES/20))/2)-2))
+    for (( i=0; i<=$LINES; i++ ))
     do
         echo ""
     done
