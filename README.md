@@ -8,7 +8,7 @@
 1. A second (bigger) blob of text in another heredoc, which is actually the base64-encoded gzipped tarball that contains the code to install
 1. Check that the extraction succeeded; if so, run the decoded installation script
 
-# Sketch of Build Steps
+## Sketch of Build Steps
 
 1. Create a temp directory whose subdirectories mirror the final directory structure , perform any build steps and place the installable scripts, etc. where they belong under it.
 1. Create a gzipped tarball of the temp directory in the packaging directory.
