@@ -38,7 +38,7 @@ PKGDIR           = pkg
 # package.  Literally everything else should depend on this for the package
 # name.
 PACKAGE_NAME     = our_awesome_utilities
-PACKAGE_VERSION := $(shell /bin/awk '/^Version/ {print $$2; exit}' ChangeLog)
+PACKAGE_VERSION := $(shell awk '/^Version/ {print $$2; exit}' ChangeLog)
 
 # This is the name of the tarball that contains the actual code being
 # installed.  I.e. - it should not contain any installation logic beyond
