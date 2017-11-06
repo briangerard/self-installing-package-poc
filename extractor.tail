@@ -6,6 +6,8 @@ then
     exit 1
 fi
 
+exit 0
+
 # Assuming all that went alright, make the installer executable and try
 # to run it (passing through any arguments that this script received).
 chmod 755 $INSTALLER_NAME

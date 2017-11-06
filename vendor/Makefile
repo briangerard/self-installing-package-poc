@@ -4,7 +4,7 @@
 # for a "live" install, or likely /var/tmp/test-our_stuff for a test
 # installation.  This allows us to test the installation without
 # destroying the live instance.
-VENDOR_DIR = ___DESTROOT__/vendor
+VENDOR_DIR = __DESTROOT__/vendor
 VENDOR_LIB = $(VENDOR_DIR)/lib/perl5
 export PERL5LIB = $(VENDOR_LIB)
 
