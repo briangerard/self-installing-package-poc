@@ -1,8 +1,9 @@
 function OurEcho() {
+    echo "Defined in ${BASH_SOURCE[0]}"
     i=1
     for arg in "$@"
     do
-        echo "Arg $i: $arg"
+        echo "    Arg $i: $arg"
         i=$((i+1))
     done
 }
