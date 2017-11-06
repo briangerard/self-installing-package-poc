@@ -99,7 +99,7 @@ then
                 # Repoint the vendor Makefile to whichever installation root
                 # we're using this run.
                 perl -pi -e 'BEGIN{$d=shift}s|__DESTROOT__|$d|g' $DEST_ROOT Makefile
-                gmake
+                make
             else
                 echo "Warning: No Makefile in 'vendor' directory."
             fi

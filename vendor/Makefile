@@ -17,22 +17,22 @@ define install_pm
 	gzip -dc $(1).tar.gz | tar xf -
 	cd $(1); \
 		perl Makefile.PL INSTALL_BASE=$(VENDOR_DIR) && \
-		gmake && \
-		gmake test && \
-		gmake install
+		make && \
+		make test && \
+		make install
 endef
 
 define install_without_tests
 	gzip -dc $(1).tar.gz | tar xf -
 	cd $(1); \
 		perl Makefile.PL INSTALL_BASE=$(VENDOR_DIR) && \
-		gmake && \
-		gmake install
+		make && \
+		make install
 endef
 
 define retest
 	cd $(1); \
-		gmake test
+		make test
 endef
 
 
