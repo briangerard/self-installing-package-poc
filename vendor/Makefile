@@ -49,7 +49,7 @@ $(Test_Harness): $(Test_Simple) $(Test_Harness).tar.gz
 $(Test_Simple): $(ExtUtils_MakeMaker) $(Test_Simple).tar.gz
 	$(call install_without_test,$(Test_Simple))
 
-$(ExtUtils_MakeMaker): $(extUtils_MakeMaker).tar.gz
+$(ExtUtils_MakeMaker): $(ExtUtils_MakeMaker).tar.gz
 	$(call install_without_tests,$(ExtUtils_MakeMaker))
 
 cleanup:
