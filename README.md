@@ -2,6 +2,7 @@
 
 ## Self-Installer Sections
 
+| Sections |
 |Preamble; set extraction paths and filenames; begin decoding of...|
 |A big blob of text in a heredoc, which is really the base64-encoded script that actually installs the "real" package|
 |Check that the extraction succeeded; if so, begin decoding of...|
@@ -10,6 +11,7 @@
 
 # Sketch of Build Steps
 
+| Steps |
 |Create a temp directory whose subdirectories mirror the final directory structure , perform any build steps and place the installable scripts, etc. where they belong under it.|
 |Create a gzipped tarball of the temp directory in the packaging directory.|
 |Copy the installation script into the packaging directory, making any necessary build time modifications.|
